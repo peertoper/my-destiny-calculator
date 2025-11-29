@@ -134,9 +134,9 @@
 <body>
   <div class="container">
     <header>
-      <h1>Path to Latin America</h1>
-      <p class="subtitle">Bolivia • Panama • Paraguay</p>
-      <p style="text-align:center;opacity:0.9;margin:20px 0">Answer honestly — your true destination will reveal itself</p>
+      <h1 id="header-title">Path to Latin America</h1>
+      <p id="subtitle" class="subtitle">Bolivia • Panama • Paraguay</p>
+      <p id="instruction" style="text-align:center;opacity:0.9;margin:20px 0">Answer honestly — your true destination will reveal itself</p>
       <div class="top-controls">
         <select id="lang" onchange="renderQuestions(this.value)">
           <option value="en">English</option>
@@ -160,9 +160,9 @@
       <div class="final-explanation" id="finalExplanation"></div>
 
       <div class="bars">
-        <div class="bar-item bolivia"><span>Bolivia</span> <span id="score-bol">0%</span><div class="bar-track"><div id="bar-bol" class="bar-fill">0%</div></div></div>
-        <div class="bar-item panama"><span>Panama</span> <span id="score-pan">0%</span><div class="bar-track"><div id="bar-pan" class="bar-fill">0%</div></div></div>
-        <div class="bar-item paraguay"><span>Paraguay</span> <span id="score-par">0%</span><div class="bar-track"><div id="bar-par" class="bar-fill">0%</div></div></div>
+        <div class="bar-item bolivia"><span id="label-bol">Bolivia</span> <span id="score-bol">0%</span><div class="bar-track"><div id="bar-bol" class="bar-fill">0%</div></div></div>
+        <div class="bar-item panama"><span id="label-pan">Panama</span> <span id="score-pan">0%</span><div class="bar-track"><div id="bar-pan" class="bar-fill">0%</div></div></div>
+        <div class="bar-item paraguay"><span id="label-par">Paraguay</span> <span id="score-par">0%</span><div class="bar-track"><div id="bar-par" class="bar-fill">0%</div></div></div>
       </div>
 
       <button type="button" class="btn-submit secondary" id="btnStartOver" onclick="location.reload()"></button>
@@ -170,35 +170,73 @@
   </div>
 
   <script>
+    const languages = {
+      en: {
+        header: "Path to Latin America",
+        subtitle: "Bolivia • Panama • Paraguay",
+        instruction: "Answer honestly — your true destination will reveal itself",
+        calcBtn: "Calculate My Destiny",
+        startOver: "Start Over",
+        winnerTitle: "Your true destination is",
+        yes: "Yes",
+        no: "No",
+        unsure: "Not sure",
+        bars: {B:"Bolivia",P:"Panama",PY:"Paraguay"}
+      },
+      ru: {
+        header: "Путь в Латинскую Америку",
+        subtitle: "Боливия • Панама • Парагвай",
+        instruction: "Отвечайте честно — ваше истинное место выберется само",
+        calcBtn: "Рассчитать",
+        startOver: "Начать заново",
+        winnerTitle: "Ваше истинное место",
+        yes: "Да",
+        no: "Нет",
+        unsure: "Не уверен",
+        bars: {B:"Боливия",P:"Панама",PY:"Парагвай"}
+      },
+      uk: {
+        header: "Шлях до Латинської Америки",
+        subtitle: "Болівія • Панама • Парагвай",
+        instruction: "Відповідайте чесно — ваш справжній напрямок відкриється сам",
+        calcBtn: "Розрахувати",
+        startOver: "Почати заново",
+        winnerTitle: "Ваш справжній напрямок",
+        yes: "Так",
+        no: "Ні",
+        unsure: "Не впевнений",
+        bars: {B:"Болівія",P:"Панама",PY:"Парагвай"}
+      }
+    };
+
     const questions = [
-      {id:1,en:'Do you prefer climates with a pronounced rainy season?',ru:'Вы предпочитаете климат с выраженным сезоном дождей?',target:'P'},
-      {id:2,en:'Do you prefer mostly dry climates?',ru:'Вы предпочитаете преимущественно сухой климат?',target:'PY'},
-      {id:4,en:'Is temperature above 24°C preferable?',ru:'Предпочтительна ли температура выше 24°C?',target:'P'},
-      {id:5,en:'Is low car purchase price important?',ru:'Важна ли низкая цена автомобиля?',target:'PY'},
-      {id:9,en:'Is strong passport important?',ru:'Важно ли много безвизовых стран?',target:'P'},
-      {id:10,en:'Is easy residency important?',ru:'Важна ли простая легализация?',target:'PY'},
-      {id:11,en:'Fast permanent residency?',ru:'Быстрое ПМЖ?',target:'PY'},
-      {id:12,en:'Residency via job offer?',ru:'Резидентство через работу?',target:'P'},
-      {id:13,en:'Cheap organic food?',ru:'Дешевые органические продукты?',target:'PY'},
-      {id:14,en:'Fast citizenship?',ru:'Быстрое гражданство?',target:'P'},
-      {id:15,en:'Cannabis tolerance?',ru:'Толерантность к каннабису?',target:'P'},
-      {id:16,en:'Ayahuasca access?',ru:'Доступ к аяуаске?',target:'B'},
-      {id:17,en:'Psilocybin tolerance?',ru:'Толерантность к псилоцибину?',target:'P'},
-      {id:18,en:'Sea access required?',ru:'Обязателен ли доступ к морю?',target:'P'},
-      {id:19,en:'Low natural disasters?',ru:'Редкие природные катастрофы?',target:'PY'},
-      {id:20,en:'Cheap construction?',ru:'Дешевое строительство?',target:'PY'},
-      {id:21,en:'Cheap land?',ru:'Дешевая земля?',target:'PY'},
-      {id:22,en:'Coastal land?',ru:'Земля у моря?',target:'P'},
-      {id:23,en:'Human rights important?',ru:'Важны ли права человека?',target:'P'},
-      {id:24,en:'Low crime rate?',ru:'Низкая преступность?',target:'PY'},
-      {id:26,en:'Low population density?',ru:'Низкая плотность населения?',target:'PY'},
-      {id:27,en:'High life expectancy?',ru:'Высокая продолжительность жизни?',target:'P'},
-      {id:28,en:'Good international flights?',ru:'Хорошие перелеты?',target:'P'},
-      {id:29,en:'Indigenous culture protection?',ru:'Защита коренных культур?',target:'B'},
-      {id:30,en:'Remote & wild place?',ru:'Удалённое и дикое место?',target:'B'}
+      {id:1,en:'Do you prefer climates with a pronounced rainy season?',ru:'Вы предпочитаете климат с выраженным сезоном дождей?',uk:'Ви віддаєте перевагу клімату з вираженим сезоном дощів?',target:'P'},
+      {id:2,en:'Do you prefer mostly dry climates?',ru:'Вы предпочитаете преимущественно сухой климат?',uk:'Ви віддаєте перевагу переважно сухому клімату?',target:'PY'},
+      {id:4,en:'Is temperature above 24°C preferable?',ru:'Предпочтительна ли температура выше 24°C?',uk:'Бажана температура понад 24°C?',target:'P'},
+      {id:5,en:'Is low car purchase price important?',ru:'Важна ли низкая цена автомобиля?',uk:'Важлива низька ціна автомобіля?',target:'PY'},
+      {id:9,en:'Is strong passport important?',ru:'Важно ли много безвизовых стран?',uk:'Важливий сильний паспорт?',target:'P'},
+      {id:10,en:'Is easy residency important?',ru:'Важна ли простая легализация?',uk:'Важлива проста легалізація?',target:'PY'},
+      {id:11,en:'Fast permanent residency?',ru:'Быстрое ПМЖ?',uk:'Швидке ПМЖ?',target:'PY'},
+      {id:12,en:'Residency via job offer?',ru:'Резидентство через работу?',uk:'Резидентство через роботу?',target:'P'},
+      {id:13,en:'Cheap organic food?',ru:'Дешевые органические продукты?',uk:'Дешеві органічні продукти?',target:'PY'},
+      {id:14,en:'Fast citizenship?',ru:'Быстрое гражданство?',uk:'Швидке громадянство?',target:'P'},
+      {id:15,en:'Cannabis tolerance?',ru:'Толерантность к каннабису?',uk:'Толерантність до канабісу?',target:'P'},
+      {id:16,en:'Ayahuasca access?',ru:'Доступ к аяуаске?',uk:'Доступ до аяуаски?',target:'B'},
+      {id:17,en:'Psilocybin tolerance?',ru:'Толерантность к псилоцибину?',uk:'Толерантність до псилоцибіну?',target:'P'},
+      {id:18,en:'Sea access required?',ru:'Обязателен ли доступ к морю?',uk:'Обов’язковий доступ до моря?',target:'P'},
+      {id:19,en:'Low natural disasters?',ru:'Редкие природные катастрофы?',uk:'Рідкі природні катастрофи?',target:'PY'},
+      {id:20,en:'Cheap construction?',ru:'Дешевое строительство?',uk:'Дешеве будівництво?',target:'PY'},
+      {id:21,en:'Cheap land?',ru:'Дешевая земля?',uk:'Дешева земля?',target:'PY'},
+      {id:22,en:'Coastal land?',ru:'Земля у моря?',uk:'Земля біля моря?',target:'P'},
+      {id:23,en:'Human rights important?',ru:'Важны ли права человека?',uk:'Важливі права людини?',target:'P'},
+      {id:24,en:'Low crime rate?',ru:'Низкая преступность?',uk:'Низький рівень злочинності?',target:'PY'},
+      {id:26,en:'Low population density?',ru:'Низкая плотность населения?',uk:'Низька густота населення?',target:'PY'},
+      {id:27,en:'High life expectancy?',ru:'Высокая продолжительность жизни?',uk:'Висока тривалість життя?',target:'P'},
+      {id:28,en:'Good international flights?',ru:'Хорошие перелеты?',uk:'Хороші міжнародні рейси?',target:'P'},
+      {id:29,en:'Indigenous culture protection?',ru:'Защита коренных культур?',uk:'Захист корінних культур?',target:'B'},
+      {id:30,en:'Remote & wild place?',ru:'Удалённое и дикое место?',uk:'Віддалене та дикое місце?',target:'B'}
     ];
 
-    const countryNames = {B:'Bolivia', P:'Panama', PY:'Paraguay'};
     const longExplanations = {
       P: {
         en: `Panama is calling you because you value freedom of movement, modern infrastructure, and a tropical coastal lifestyle. With one of the strongest passports in Latin America, dollarized economy, world-class banking, and direct flights to everywhere, Panama offers the perfect bridge between continents. You’ll enjoy year-round warmth, two oceans, Bocas del Toro islands, and a vibrant expat scene — all while keeping maximum global mobility and legal flexibility.`,
@@ -207,21 +245,29 @@
       },
       PY: {
         en: `Paraguay is your true home for those who dream of real land ownership, low taxes, and peaceful rural life with almost no bureaucracy. Here you can buy fertile land for pennies, build your dream estate, grow anything, and live completely sovereign. The residency process is one of the fastest and cheapest on earth, and the country stays deliberately under the radar — perfect for anyone seeking authentic freedom, space, and a slower, more grounded existence.`,
-        ru: `Парагвай — ваш настоящий дом для тех, кто мечтает о владении землёй, низких налогах и спокойной сельской жизни с почти полной отсутствием бюрократии. Здесь можно купить плодородную землю за копейки, построить дом мечты, выращивать всё, что угодно, и жить полностью независимо. Процесс получения резидентства один из самых быстрых и дешевых на планете, а страна намеренно остаётся вне радаров — идеально для тех, кто ищет настоящую свободу, пространство и медленный, более приземлённый образ жизни.`,
-        uk: `Парагвай — ваш справжній дім для тих, хто мріє про володіння землею, низькі податки та спокійне сільське життя з майже повною відсутністю бюрократії. Тут можна купити родючу землю за копійки, побудувати дім мрії, вирощувати будь-що та жити повністю незалежно. Процес отримання резидентства один із найшвидших і найдешевших на планеті, а країна навмисне залишається поза радарами — ідеально для тих, хто шукає справжню свободу, простір і повільний, більш приземлений спосіб життя.`
+        ru: `Парагвай — ваш настоящий дом для тех, кто мечтает о владении землёй, низких налогах и спокойной сельской жизни с почти полной отсутствием бюрократии. Здесь можно купить плодородную землю за копейки, построить дом мечты, выращивать всё, что угодно, и жить полностью свободно. Процесс получения резидентства один из самых быстрых и дешевых на планете, страна сознательно остаётся вне внимания — идеально для тех, кто ищет подлинную свободу, пространство и медленный, размеренный образ жизни.`,
+        uk: `Парагвай — ваш справжній дім для тих, хто мріє про володіння землею, низькі податки та спокійне сільське життя майже без бюрократії. Тут можна купити родючу землю за копійки, побудувати дім мрії, вирощувати що завгодно та жити повністю самостійно. Процес отримання резидентства один із найшвидших і найдешевших у світі, а країна навмисно залишається поза увагою — ідеально для тих, хто шукає справжню свободу, простір та повільне, осмислене життя.`
       },
       B: {
         en: `Bolivia chose you because you are drawn to high mountains, indigenous wisdom, and places where ancient traditions still breathe. From the Altiplano to the Yungas cloud forests, this is the land of powerful medicine, sacred lakes, and living cultures. You’ll find cooler climates, dramatic landscapes, and a society that still honors the earth — a perfect refuge for those seeking depth, healing, and a life far from the noise of the modern world.`,
-        ru: `Боливия выбрала вас, потому что вас тянет к высоким горам, коренной мудрости и местам, где живут древние традиции. От Альтиплано до облачных лесов Юнгас — это земля мощной медицины, священных озёр и живых культур. Вы найдёте прохладный климат, драматические пейзажи и общество, которое до сих пор чтит землю — идеальное убежище для тех, кто ищет глубину, исцеление и жизнь вдали от шума современного мира.`,
-        uk: `Болівія обрала вас, бо вас тягне до високих гір, корінної мудрості та місць, де живуть давні традиції. Від Альтіплано до хмарних лісів Юнгас — це земля потужної медицини, священних озер і живих культур. Ви знайдете прохолодний клімат, драматичні пейзажі та суспільство, яке досі шанує землю — ідеальне притулок для тих, хто шукає глибину, зцілення та життя далеко від шуму сучасного світу.`
+        ru: `Боливия выбрала вас, потому что вас тянет к высоким горам, мудрости коренных народов и местам, где древние традиции ещё живы. От Альтиплано до облачных лесов Юнгас — это земля мощной медицины, священных озёр и живых культур. Вас ждут прохладные климатические зоны, драматические пейзажи и общество, которое по-прежнему чтит землю — идеальное убежище для тех, кто ищет глубину, исцеление и жизнь вдали от шума современного мира.`,
+        uk: `Болівія обрала вас, бо вас тягне до високих гір, мудрості корінних народів та місць, де древні традиції ще живі. Від Альтіплано до хмарних лісів Юнгас — це земля потужної медицини, священних озер і живих культур. Вас чекають прохолодні кліматичні зони, драматичні пейзажі та суспільство, яке досі шанує землю — ідеальне притулок для тих, хто шукає глибину, зцілення та життя далеко від шуму сучасного світу.`
       }
     };
 
-    const startOverText = {en:'Start Over', ru:'Начать заново', uk:'Почати заново'};
-    const winnerTitleText = {en:'Your true destination is', ru:'Ваше истинное место', uk:'Ваш справжній напрямок'};
+    const countryNames = {B:'Bolivia', P:'Panama', PY:'Paraguay'};
 
     function renderQuestions(lang='en'){
-      document.getElementById('calcBtn').innerText = lang==='ru'?'Рассчитать':lang==='uk'?'Розрахувати':'Calculate My Destiny';
+      const l = languages[lang];
+      document.getElementById('header-title').innerText = l.header;
+      document.getElementById('subtitle').innerText = l.subtitle;
+      document.getElementById('instruction').innerText = l.instruction;
+      document.getElementById('calcBtn').innerText = l.calcBtn;
+      document.getElementById('label-bol').innerText = l.bars.B;
+      document.getElementById('label-pan').innerText = l.bars.P;
+      document.getElementById('label-par').innerText = l.bars.PY;
+      document.getElementById('btnStartOver').innerText = l.startOver;
+
       document.getElementById('questions-container').innerHTML='';
       questions.forEach((q,i)=>{
         const div=document.createElement('div');div.className='question-item';
@@ -229,11 +275,11 @@
         txt.innerText=lang==='ru'?q.ru:(lang==='uk'?q.uk:q.en);
         const opts=document.createElement('div');opts.className='options';
         ['yes','no','unsure'].forEach(v=>{
-          const l=document.createElement('label');
+          const llabel=document.createElement('label');
           const r=document.createElement('input');r.type='radio';r.name='q'+i;r.value=v;
-          l.appendChild(r);
-          l.appendChild(document.createTextNode(' '+(v==='yes'?(lang==='ru'?'Да':lang==='uk'?'Так':'Yes'):v==='no'?(lang==='ru'?'Нет':lang==='uk'?'Ні':'No'):(lang==='ru'?'Не уверен':lang==='uk'?'Не впевнений':'Not sure'))));
-          opts.appendChild(l);
+          llabel.appendChild(r);
+          llabel.appendChild(document.createTextNode(' '+(v==='yes'?l.yes:v==='no'?l.no:l.unsure)));
+          opts.appendChild(llabel);
         });
         div.appendChild(txt);div.appendChild(opts);
         document.getElementById('questions-container').appendChild(div);
@@ -242,6 +288,7 @@
 
     function calculateDestiny(){
       const lang = document.getElementById('lang').value;
+      const l = languages[lang];
       const scores={B:0,P:0,PY:0};
       questions.forEach((q,i)=>{
         const sel=document.querySelector(`input[name=q${i}]:checked`);
@@ -262,10 +309,9 @@
       document.getElementById('quizForm').style.display='none';
       document.getElementById('results-section').style.display='block';
 
-      document.getElementById('winner-title').innerText = winnerTitleText[lang];
+      document.getElementById('winner-title').innerText = l.winnerTitle;
       document.getElementById('winner-name').innerText = countryNames[winner];
       document.getElementById('finalExplanation').innerText = longExplanations[winner][lang];
-      document.getElementById('btnStartOver').innerText = startOverText[lang];
 
       document.getElementById('score-bol').innerText = pct.B+'%';
       document.getElementById('score-pan').innerText = pct.P+'%';
