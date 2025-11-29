@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Path to Latin America: The Destiny Calculator</title>
+  <style>
+    :root{--primary:#d35400;--secondary:#2c3e50;--bg:#fdf5e6;--card-bg:#fff;--accent:#f1c40f;--bolivia:#e74c3c;--panama:#3498db;--paraguay:#27ae60}
+    body{font-family:Segoe UI, Tahoma, Geneva, Verdana, sans-serif;background:var(--bg);color:var(--secondary);margin:0;padding:20px}
+    .container{max-width:800px;margin:0 auto;background:var(--card-bg);padding:40px;border-radius:15px;box-shadow:0 10px 25px rgba(0,0,0,.1)}
+    header{text-align:center;margin-bottom:40px;border-bottom:2px solid var(--primary);padding-bottom:20px}
+    h1{color:var(--primary);margin:0;font-size:2.2rem}
+    .top-controls{display:flex;justify-content:center;gap:10px;margin-top:10px}
+    select{padding:8px 12px;border-radius:8px;border:1px solid #ddd;font-weight:600}
+    .question-item{margin-bottom:20px;padding:15px;border-radius:8px;background:#fffaf0;border-left:5px solid var(--primary)}
+    .question-text{font-weight:600;font-size:1.05rem;margin-bottom:8px;display:block}
+    .options{display:flex;gap:18px}
+    label{cursor:pointer;display:flex;align-items:center;gap:8px}
+    input[type=radio]{transform:scale(1.15);accent-color:var(--primary)}
+    .btn-submit{display:block;width:100%;padding:16px;background:var(--primary);color:#fff;border:none;border-radius:10px;font-size:1.2rem;font-weight:700;cursor:pointer;margin-top:20px}
+    .btn-submit.secondary{background:#7f8c8d}
+    #results-section{display:none;margin-top:20px}
+    .winner-banner{background:#fce4ec;padding:20px;border-radius:12px;border:2px dashed var(--primary);text-align:left}
+    .winner-flag{font-size:4rem;display:block;margin:12px 0}
+    .chart-container{margin-top:20px}
+    .bar-track{background:#eee;height:26px;border-radius:14px;overflow:hidden}
+    .bar-fill{height:100%;width:0;display:flex;align-items:center;justify-content:flex-end;padding-right:10px;color:#fff;font-weight:700;transition:width 1.2s}
+    .bolivia{background:var(--bolivia)}.panama{background:var(--panama)}.paraguay{background:var(--paraguay)}
+    .explanations,.sources{margin-top:12px;padding:12px;border-radius:8px;font-size:0.95rem}
+    .explanations{background:#fffdf7;border-left:4px solid var(--accent)}.sources{background:#fbfbff;border-left:4px solid #ccc}
+    @media(max-width:600px){.options{flex-direction:column}}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1 id="page-title">Path to Latin America</h1>
+      <p id="subtitle" class="subtitle">Bolivia • Panama • Paraguay</p>
+      <p id="intro">Answer 30 focused questions to discover your ideal migration destination.</p>
+      <div class="top-controls">
+        <label for="lang">Language:</label>
+        <select id="lang" onchange="renderQuestions(this.value)">
+          <option value="en">English</option>
+          <option value="ru">Русский</option>
+          <option value="uk">Українська</option>
+        </select>
+      </div>
+    </header>
+
+    <form id="quizForm">
+      <div id="questions-container"></div>
+      <button type="button" class="btn-submit" id="calcBtn" onclick="calculateDestiny()">Calculate My Destiny</button>
+    </form>
+
+    <div id="results-section">
+      <div class="winner-banner">
+        <h2 id="winner-header">Your choice is <span id="winner-name" style="color:var(--primary)"></span></h2>
+        <span id="winner-flag" class="winner-flag"></span>
+        <p id="winner-desc"></p>
+        <div class="explanations" id="explanations"></div>
+        <div class="sources" id="sources"><strong>Sources used in the analysis</strong><ul id="sources-list"></ul></div>
+      </div>
+
+      <div class="chart-container">
+        <h3>Compatibility Breakdown</h3>
+        <div style="margin-top:10px"><div style="display:flex;justify-content:space-between"><strong>Bolivia</strong><span id="score-bol">0%</span></div><div class="bar-track"><div id="bar-bol" class="bar-fill bolivia"></div></div></div>
+        <div style="margin-top:10px"><div style="display:flex;justify-content:space-between"><strong>Panama</strong><span id="score-pan">0%</span></div><div class="bar-track"><div id="bar-pan" class="bar-fill panama"></div></div></div>
+        <div style="margin-top:10px"><div style="display:flex;justify-content:space-between"><strong>Paraguay</strong><span id="score-par">0%</span></div><div class="bar-track"><div id="bar-par" class="bar-fill paraguay"></div></div></div>
+      </div>
+
+      <button type="button" class="btn-submit secondary" onclick="location.reload()">Start Over</button>
+    </div>
+  </div>
+
+  <script>
+    // Questions: replaced automobile-related and temperature-extreme items as requested.
+    const questions = [
+      {id:1,en:'Do you prefer climates with a pronounced rainy season (many rain days) over mostly dry climates?',ru:'Вы предпочитаете климат с выраженным сезоном дождей (много дождливых дней) вместо преимущественно сухого климата?',uk:'Ви надаєте перевагу клімату з вираженим сезоном дощів (багато дощових днів) замість переважно сухого клімату?',target:'P'},
+      {id:2,en:'Do you prefer mostly dry climates with long dry seasons?',ru:'Вы предпочитаете преимущественно сухой климат с длительным сухим сезоном?',uk:'Ви надаєте перевагу переважно сухому клімату з тривалим сухим сезоном?',target:'PY'},
+      {id:3,en:'Is an average annual temperature under 18°C preferable for you?',ru:'Предпочтительна ли для вас средняя годовая температура ниже 18°C?',uk:'Чи віддаєте ви перевагу середній річній температурі нижче 18°C?',target:'B'},
+      {id:4,en:'Is an average annual temperature above 24°C preferable for you?',ru:'Предпочтительна ли для вас средняя годовая температура выше 24°C?',uk:'Чи віддаєте ви перевагу середній річній температурі вище 24°C?',target:'P'},
+      // New car price questions (replacing: freezing-days, extremes, ownership cost, registration)
+      {id:5,en:'Is it important for you that the purchase price of a new car is low (affordable local prices for brand-new vehicles)?',ru:'Важно ли для вас, чтобы стоимость покупки нового автомобиля была низкой (доступные цены на новые автомобили)?',uk:'Чи важливо для вас, щоб вартість покупки нового автомобіля була низькою (доступні ціни на нові авто)?',target:'PY'},
+      {id:6,en:'Is it important for you that the purchase price of a used car is low (affordable local prices for second-hand vehicles)?',ru:'Важно ли для вас, чтобы стоимость покупки подержанного автомобиля была низкой (доступные цены на б/у авто)?',uk:'Чи важливо для вас, щоб вартість покупки вживаного автомобіля була низькою (доступні ціни на б/у авто)?',target:'PY'},
+      // continue with existing topics (shifted IDs)
+      {id:7,en:'Are low annual occurrences of freezing temperatures important to you (few or no days below 0°C)?',ru:'Важно ли для вас, чтобы были редкие заморозки в году (мало или нет дней ниже 0°C)?',uk:'Чи важливо для вас, щоб у році було мало днів із морозами (нижче 0°C)?',target:'PY'},
+      {id:8,en:'Do you value clearly defined lowest and highest temperature ranges (do temperature extremes matter to you)?',ru:'Вам важно, чтобы были чётко определённые минимальные и максимальные температуры (экстремумы имеют значение)?',uk:'Чи цінуєте ви чітко визначені мінімальні та максимальні температури (чи мають значення екстремуми)?',target:'B'},
+      {id:9,en:'Is extensive visa-free travel (many visa-free destinations) important?',ru:'Важно ли вам широкое безвизовое путешествие (много безвизовых направлений)?',uk:'Чи важливі для вас широкі безвізові поїздки (багато безвізових напрямків)?',target:'P'},
+      {id:10,en:'Is a low cost and straightforward process to legalise your stay (temporary residency) important?',ru:'Важно ли вам, чтобы процесс легализации пребывания (временное резиденство) был недорогим и простым?',uk:'Чи важливий для вас недорогий і простий процес легалізації перебування (тимчасове резиденство)?',target:'PY'},
+      {id:11,en:'Would you value fast and affordable pathways to permanent residency?',ru:'Ценили бы вы быстрые и недорогие пути к постоянному резидентству?',uk:'Чи цінували б ви швидкі та доступні шляхи до постійного резидентства?',target:'PY'},
+      {id:12,en:'Is the possibility to legalise residency via a job offer important (ease and cost)?',ru:'Важно ли для вас иметь возможность легализовать резидентство через предложение работы (простота и стоимость)?',uk:'Чи важлива для вас можливість легалізації резиденства через пропозицію роботи (простота та вартість)?',target:'P'},
+      {id:13,en:'Are low prices for organic / natural / local fruits and vegetables important?',ru:'Важны ли для вас низкие цены на органические/натуральные/местные фрукты и овощи?',uk:'Чи важливі для вас низькі ціни на органічні/натуральні/місцеві фрукти та овочі?',target:'PY'},
+      {id:14,en:'Is short time and low cost to obtain a local passport a requirement?',ru:'Требуется ли вам короткое время и низкая стоимость получения местного паспорта?',uk:'Чи є для вас вимогою короткий термін і низька вартість отримання місцевого паспорта?',target:'P'},
+      {id:15,en:'Is a permissive legal framework for cannabis important?',ru:'Важно ли вам, чтобы правовая система была лояльна к каннабису (марихуане)?',uk:'Чи важливо для вас, щоб правова система була лояльною до канабісу (марихуани)?',target:'P'},
+      {id:16,en:'Is legal or tolerated access to traditional plant medicines (e.g., ayahuasca) important?',ru:'Важно ли для вас легальное или терпимое отношение к традиционным растительным лекарствам (например, аяуаска)?',uk:'Чи важливий для вас легальний або толерантний доступ до традиційних рослинних ліків (наприклад, аяваска)?',target:'B'},
+      {id:17,en:'Is a tolerant legal approach to psilocybin important?',ru:'Важно ли вам терпимое отношение закона к псилоцибину (псилоцибиновые грибы)?',uk:'Чи важливе для вас толерантне ставлення закону до псилоцибіну ("чарівні" гриби)?',target:'P'},
+      {id:18,en:'Is sea access (coastline or convenient access to beaches) a strict requirement?',ru:'Является ли доступ к морю (береговая линия или удобный доступ к пляжам) обязательным требованием?',uk:'Чи є доступ до моря (прибережна смуга або зручний доступ до пляжів) обов\'язковою вимогою?',target:'P'},
+      {id:19,en:'Is low frequency of natural disasters (earthquakes, hurricanes, major floods) a priority?',ru:'Является ли приоритетом низкая частота природных катастроф (землетрясения, ураганы, крупные наводнения)?',uk:'Чи є пріоритетом низька частота природних катастроф (землетруси, урагани, великі повені)?',target:'PY'},
+      {id:20,en:'Is low cost of construction labour important for building your own house?',ru:'Важно ли вам низкая стоимость строительной рабочей силы для строительства собственного дома?',uk:'Чи важлива для вас низька вартість будівельної робочої сили для зведення власного будинку?',target:'PY'},
+      {id:21,en:'Is low cost to purchase land (cheap land per hectare) a key factor?',ru:'Является ли ключевым фактором низкая стоимость покупки земли (дешёвая земля за гектар)?',uk:'Чи є ключовим фактором низька вартість покупки землі (дешева земля за гектар)?',target:'PY'},
+      {id:22,en:'Is it important for you that land be coastal (not landlocked)?',ru:'Важно ли для вас, чтобы земля имела выход к морю (не была в глубинке)?',uk:'Чи важливо для вас, щоб земля мала доступ до моря (не була без виходу до узбережжя)?',target:'P'},
+      {id:23,en:'Do human-rights ratings and civil liberties indices significantly influence your choice?',ru:'Значимо ли для вашего выбора рейтинги прав человека и индексы гражданских свобод?',uk:'Чи значною мірою впливають на ваш вибір рейтинги прав людини та індекси громадянських свобод?',target:'P'},
+      {id:24,en:'Are low theft / robbery rates important for your safety assessment?',ru:'Важны ли для вас низкие показатели краж/ограблений при оценке безопасности?',uk:'Чи важливі для вас низькі показники крадіжок/пограбувань при оцінці безпеки?',target:'PY'},
+      {id:25,en:'Is a low general crime rate (violent crime) a strict requirement?',ru:'Является ли низкий общий уровень преступности (насильственная преступность) обязательным требованием?',uk:'Чи є низький загальний рівень злочинності (насильницькі злочини) обов\'язковою вимогою?',target:'PY'},
+      {id:26,en:'Does low population density (more space per km²) matter to you?',ru:'Важна ли для вас низкая плотность населения (больше пространства на км²)?',uk:'Чи має для вас значення низька густота населення (більше простору на км²)?',target:'PY'},
+      {id:27,en:'Is a high average life expectancy an important health indicator for your choice?',ru:'Является ли высокий средний ожидаемый срок жизни важным показателем здоровья при выборе?',uk:'Чи є високий середній очікуваний тривалість життя важним показником здоров\'я при виборі?',target:'P'},
+      {id:28,en:'Do you value easy access to international air travel and a major travel hub?',ru:'Цените ли вы лёгкий доступ к международным авиаперелётам и наличие крупного транспортного узла?',uk:'Чи цінуєте ви легкий доступ до міжнародних авіаперельотів та наявність великого транспортного хабу?',target:'P'},
+      {id:29,en:'Is strong protection of indigenous cultures and traditions important to you?',ru:'Важно ли для вас сильная защита коренных культур и традиций?',uk:'Чи важливий для вас сильний захист корінних культур і традицій?',target:'B'},
+      {id:30,en:'Do you prefer a place that feels remote and off the beaten path?',ru:'Предпочитаете ли вы место, которое кажется удалённым и вне проторённого пути?',uk:'Ви надаєте перевагу місцю, що здається віддаленим і поза проторованим шляхом?',target:'B'}
+    ];
+
+    const ui = {
+      en:{calc:'Calculate My Destiny',start:'Start Over',header:'Path to Latin America',intro:'Answer 30 focused questions to discover your ideal migration destination.'},
+      ru:{calc:'Рассчитать мое направление',start:'Начать сначала',header:'Путь в Латинскую Америку',intro:'Ответьте на 30 вопросов для определения идеальной страны для миграции.'},
+      uk:{calc:'Розрахувати мій напрямок',start:'Почати спочатку',header:'Шлях до Латинської Америки',intro:'Відповідь на 30 питань допоможе визначити ідеальну країну для міграції.'}
+    };
+
+    function renderQuestions(lang='en'){
+      try{
+        document.getElementById('page-title').innerText = ui[lang].header;
+        document.getElementById('intro').innerText = ui[lang].intro;
+        document.getElementById('subtitle').innerText = 'Bolivia • Panama • Paraguay';
+        document.getElementById('calcBtn').innerText = ui[lang].calc;
+        document.getElementById('questions-container').innerHTML = '';
+
+        questions.forEach((q,idx)=>{
+          const wrapper=document.createElement('div');wrapper.className='question-item';
+          const qText=document.createElement('span');qText.className='question-text';
+          qText.innerText = (lang==='ru')?q.ru:(lang==='uk')?q.uk:q.en;
+          const opts=document.createElement('div');opts.className='options';
+
+          const yesLabel=createOption(idx,'yes',lang==='ru'?'Да':(lang==='uk'?'Так':'Yes'));
+          const noLabel=createOption(idx,'no',lang==='ru'?'Нет':(lang==='uk'?'Ні':'No'));
+          const unsureLabel=createOption(idx,'unsure',lang==='ru'?'Не уверен':(lang==='uk'?'Не впевнений':'Not Sure'));
+
+          opts.appendChild(yesLabel);opts.appendChild(noLabel);opts.appendChild(unsureLabel);
+          wrapper.appendChild(qText);wrapper.appendChild(opts);
+          document.getElementById('questions-container').appendChild(wrapper);
+        });
+      }catch(e){console.error('renderQuestions error',e);}
+    }
+
+    function createOption(index,value,labelText){
+      const label=document.createElement('label');
+      const input=document.createElement('input');input.type='radio';input.name='q'+index;input.value=value;
+      label.appendChild(input);label.appendChild(document.createTextNode(' '+labelText));return label;
+    }
+
+    // initial render
+    renderQuestions(document.getElementById('lang').value);
+
+    const defaultSources=['Henley Passport Index — passport strength and visa-free access','World Bank — economic indicators and population data','World Health Organization — life expectancy and health data','Numbeo — cost-of-living and prices','Amnesty International / Human Rights Watch — human-rights reports','Official government immigration pages — residency and passport procedures'];
+
+    const significanceNotes = {
+      rain:'Preference for rain vs dry seasons affects agriculture, fruit availability and daily comfort.',
+      avgTemp:'Average temperature shapes energy needs and crop suitability.',
+      vehiclePurchase:'Purchase price (new/used) determines the initial capital needed for mobility and affects monthly budget and import duties.',
+      vehicle:'Vehicle ownership cost affects monthly budget and rural mobility.',
+      visa:'Passport strength determines ease of international travel.',
+      legalise:'Ease and cost of legalisation determine how readily you can stay long term.',
+      food:'Prices for organic/local food reflect food security and daily-diet costs.',
+      drug:'Drug laws affect personal legal risk and access to traditional medicines.',
+      sea:'Sea access determines coastal lifestyle, fishing and port access; Panama has Pacific and Caribbean coasts.',
+      disasters:'Natural-disaster frequency affects insurance, resilience and building standards.',
+      land:'Land price drives initial capital for purchase and construction.',
+      humanRights:'Human-rights ratings indicate rule of law and civil liberties.',
+      crime:'Crime rates determine safety measures and quality of life.'
+    };
+
+    function calculateDestiny(){
+      try{
+        const scores={B:0,P:0,PY:0};const yesAnswers=[];
+        questions.forEach((q,idx)=>{
+          const sel=document.querySelector('input[name=q'+idx+']:checked');
+          if(sel && sel.value==='yes'){ scores[q.target]++; yesAnswers.push(q); }
+        });
+
+        const total=scores.B+scores.P+scores.PY;
+        let pctB=0,pctP=0,pctPY=0;
+        if(total>0){pctB=Math.round((scores.B/total)*100);pctP=Math.round((scores.P/total)*100);pctPY=Math.round((scores.PY/total)*100);}const sum=pctB+pctP+pctPY; if(total>0 && sum!==100) pctPY+=100-sum;
+
+        let winner='Paraguay',flag='🇵🇾',max=scores.PY; if(scores.P>max){max=scores.P;winner='Panama';flag='🇵🇦'} if(scores.B>max){max=scores.B;winner='Bolivia';flag='🇧🇴'}
+
+        document.getElementById('quizForm').style.display='none';document.getElementById('results-section').style.display='block';window.scrollTo(0,0);
+        document.getElementById('winner-name').innerText=winner;document.getElementById('winner-flag').innerText=flag;
+
+        updateBar('bar-bol','score-bol',pctB);updateBar('bar-pan','score-pan',pctP);updateBar('bar-par','score-par',pctPY);
+        buildExplanations(yesAnswers,document.getElementById('lang').value);
+        populateSources(document.getElementById('lang').value);
+      }catch(e){console.error('calculateDestiny error',e);alert('An error occurred. Check console for details.');}
+    }
+
+    function updateBar(barId,scoreId,percent){document.getElementById(scoreId).innerText=percent+'%';setTimeout(()=>{document.getElementById(barId).style.width=percent+'%';},80)}
+
+    function buildExplanations(yesAnswers,lang){
+      const c=document.getElementById('explanations');c.innerHTML='';
+      if(yesAnswers.length===0){c.innerText=(lang==='ru')?'Вы не выбрали ни одного предпочтения "Да". Результаты основаны на общих профилях стран.':(lang==='uk')?'Ви не обрали жодного уподобання "Так". Результати засновані на загальних профілях країн.':'You did not select any "Yes" preferences. Results are based on general country profiles.';return}
+
+      yesAnswers.forEach(q=>{
+        const block=document.createElement('div');block.style.marginBottom='10px';
+        const title=document.createElement('div');title.style.fontWeight=700;title.innerText=(lang==='ru')?q.ru:(lang==='uk')?q.uk:q.en;
+        const significance=document.createElement('div');significance.style.marginTop='6px';significance.innerText=mapSignificance(q);
+        const countryNote=document.createElement('div');countryNote.style.marginTop='6px';countryNote.style.color='#444';countryNote.innerText=countrySpecificNote(q.target);
+        block.appendChild(title);block.appendChild(significance);block.appendChild(countryNote);c.appendChild(block);
+      });
+    }
+
+    function mapSignificance(q){
+      const text=q.en.toLowerCase();
+      if(text.includes('rain')) return significanceNotes.rain;
+      if(text.includes('temperature')||text.includes('freeze')||text.includes('freezing')) return significanceNotes.avgTemp;
+      if(text.includes('new car')||text.includes('purchase price')||text.includes('used car')||text.includes('б/у')||text.includes('подержан')) return significanceNotes.vehiclePurchase;
+      if(text.includes('vehicle')||text.includes('car ownership')||text.includes('ownership')) return significanceNotes.vehicle;
+      if(text.includes('visa')) return significanceNotes.visa;
+      if(text.includes('legalise')||text.includes('residency')) return significanceNotes.legalise;
+      if(text.includes('organic')||text.includes('fruits')||text.includes('food')) return significanceNotes.food;
+      if(text.includes('cannabis')||text.includes('ayahuasca')||text.includes('psilocybin')||text.includes('drug')) return significanceNotes.drug;
+      if(text.includes('sea')||text.includes('coast')) return significanceNotes.sea;
+      if(text.includes('disaster')||text.includes('earthquake')||text.includes('hurricane')) return significanceNotes.disasters;
+      if(text.includes('land')||text.includes('hectare')) return significanceNotes.land;
+      if(text.includes('human-rights')||text.includes('human rights')) return significanceNotes.humanRights;
+      if(text.includes('theft')||text.includes('robbery')||text.includes('crime')) return significanceNotes.crime;
+      return significanceNotes.land;
+    }
+
+    function countrySpecificNote(target){
+      if(target==='P') return 'Country note: Panama — strong for sea access, international hub connectivity and dollarisation.';
+      if(target==='PY') return 'Country note: Paraguay — favourable for cheap land, lower costs and tranquillity.';
+      if(target==='B') return 'Country note: Bolivia — favourable for high-altitude cooler climate and cultural variety.';
+      return '';
+    }
+
+    function populateSources(lang){
+      const list=document.getElementById('sources-list');list.innerHTML='';defaultSources.forEach(s=>{const li=document.createElement('li');li.innerText=s;list.appendChild(li)});
+    }
+  </script>
+</body>
+</html>
